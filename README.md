@@ -86,10 +86,10 @@ nodemon index.js
 ## 🌐 Open in Browser
 
 Visit:
-
+http://localhost:3000
 ```
 
-http://localhost:3000
+
 
 ```
 
