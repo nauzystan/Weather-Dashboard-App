@@ -62,11 +62,13 @@ OR Create a `.env` file in the root:
 
 OPENWEATHER_API_KEY=your_api_key_here
 
+```
 
 ## ▶️ Running the App
 
 Start the server:
 
+```
 node index.js
 ```
 
