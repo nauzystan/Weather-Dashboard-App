@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Weather App</title>
+    <link rel="stylesheet" href="/styles/main.css" />
+</head>
+
+<body>
+    <div class="container">
+
+        <header class="header">
+            <h1>🌤 Weather Dashboard</h1>
+            <p>Check real-time weather anywhere</p>
+        </header>
+
+        <section class="form-section">
+            <form action="/get-forecast" method="POST" class="weather-form">
+
+                <div class="input-group">
+                    <input type="text" name="city" placeholder="City (e.g Lagos)" required />
+                    <input type="text" name="code" placeholder="Country Code (e.g NG)" required />
+                </div>
+
+                <button type="submit" class="btn-primary">Get Weather</button>
+            </form>
+        </section>
+
+        <section class="result-section">
+            <% if (content && content.main) { %>
+
+                <div class="weather-card">
+                    <h2>
+                        <%= content.name %>, <%= content.sys.country %>
+                    </h2>
+
+                    <div class="weather-main">
+                        <img src="https://openweathermap.org/img/wn/<%= content.weather[0].icon %>@2x.png"
+                            alt="weather icon" />
+                        <h1>
+                            <%= Math.round(content.main.temp) %>°C
+                        </h1>
+                    </div>
+
+                    <p class="description">
+                        <%= content.weather[0].description %>
+                    </p>
+
+                    <div class="weather-details">
+                        <div>
+                            <span>Humidity</span>
+                            <p>
+                                <%= content.main.humidity %>%
+                            </p>
+                        </div>
+
+                        <div>
+                            <span>Wind</span>
+                            <p>
+                                <%= content.wind.speed %> m/s
+                            </p>
+                        </div>
+
+                        <div>
+                            <span>Feels Like</span>
+                            <p>
+                                <%= Math.round(content.main.feels_like) %>°C
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+
+                <% } else {%>
+                    <p>
+                        <%= content %>
+                    </p>
+                    <% } %>
+        </section>
+
+    </div>
+</body>
+
+</html>
