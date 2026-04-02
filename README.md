@@ -61,7 +61,7 @@ OR Create a `.env` file in the root:
 ```js
 
 OPENWEATHER_API_KEY=your_api_key_here
----
+
 
 ## ▶️ Running the App
 
@@ -81,7 +81,7 @@ nodemon index.js
 
 ```
 
----
+
 
 ## 🌐 Open in Browser
 
@@ -93,11 +93,9 @@ http://localhost:3000
 
 ```
 
----
+
 
 ## 📁 Project Structure
-
-```
 
 Weather Dashboard App/
 │── public/
@@ -109,7 +107,5 @@ Weather Dashboard App/
 │
 │── index.js
 │── package.json
-
-```
 
 ```
