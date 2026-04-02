@@ -67,17 +67,19 @@ OPENWEATHER_API_KEY=your_api_key_here
 
 Start the server:
 
+node index.js
 ```
 
-node index.js
+
 
 ```
 
 OR (if you have nodemon installed):
 
+nodemon index.js
 ```
 
-nodemon index.js
+
 
 ```
 
