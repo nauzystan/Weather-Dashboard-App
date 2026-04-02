@@ -78,16 +78,18 @@ OR (if you have nodemon installed):
 nodemon index.js
 ```
 
-```
+
 ## 🌐 Open in Browser
 
+```
 Visit:
 http://localhost:3000
 ```
 
-```
+
 ## 📁 Project Structure
 
+```
 Weather Dashboard App/
 │── public/
 │ └── styles/
