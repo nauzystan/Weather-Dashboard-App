@@ -9,78 +9,386 @@
 </head>
 
 <body>
-    <div class="container">
 
-        <header class="header">
-            <h1>🌤 Weather Dashboard</h1>
-            <p>Check real-time weather anywhere</p>
-        </header>
+    <div class="shooting-star star-1"></div>
+    <div class="shooting-star star-2"></div>
+    <div class="shooting-star star-3"></div>
 
-        <section class="form-section">
-            <form action="/get-forecast" method="POST" class="weather-form">
+    <div class="asteroid asteroid-1"></div>
+    <div class="asteroid asteroid-2"></div>
 
-                <div class="input-group">
-                    <input type="text" name="city" placeholder="City (e.g Lagos)" required />
-                    <input type="text" name="code" placeholder="Country Code (e.g NG)" required />
-                </div>
+    <div class="app-layout">
 
-                <button type="submit" class="btn-primary">Get Weather</button>
-            </form>
-        </section>
+        <aside class="sidebar">
 
-        <section class="result-section">
-            <% if (content && content.main) { %>
+            <div class="sidebar-badge">
+                Weather Dashboard App
+            </div>
 
-                <div class="weather-card">
-                    <h2>
-                        <%= content.name %>, <%= content.sys.country %>
-                    </h2>
+            <h1 class="hero-title">
+                Next-Level Weather Experience
+            </h1>
 
-                    <div class="weather-main">
-                        <img src="https://openweathermap.org/img/wn/<%= content.weather[0].icon %>@2x.png"
-                            alt="weather icon" />
-                        <h1>
-                            <%= Math.round(content.main.temp) %>°C
-                        </h1>
-                    </div>
+            <p class="hero-subtitle">
+                Real-time data. Beautiful visuals.
+                Powerful features.
+            </p>
 
-                    <p class="description">
-                        <%= content.weather[0].description %>
-                    </p>
+            <ul class="feature-list">
+                <li>✓ Real-time Weather Data</li>
+                <li>✓ Interactive Space Theme</li>
+                <li>✓ Hourly Forecasts</li>
+                <li>✓ 7-Day Forecasts</li>
+                <li>✓ Search History</li>
+                <li>✓ Favorites</li>
 
-                    <div class="weather-details">
-                        <div>
-                            <span>Humidity</span>
-                            <p>
-                                <%= content.main.humidity %>%
-                            </p>
-                        </div>
+                <div class="history-box">
 
-                        <div>
-                            <span>Wind</span>
-                            <p>
-                                <%= content.wind.speed %> m/s
-                            </p>
-                        </div>
+                    <h3>Recent Searches</h3>
 
-                        <div>
-                            <span>Feels Like</span>
-                            <p>
-                                <%= Math.round(content.main.feels_like) %>°C
-                            </p>
-                        </div>
-                    </div>
+                    <% if(searchHistory && searchHistory.length){ %>
+
+                        <% searchHistory.forEach(item=> { %>
+
+                            <div class="history-item">
+                                <%= item %>
+                            </div>
+
+                            <% }) %>
+
+                                <% } %>
 
                 </div>
+            </ul>
 
-                <% } else {%>
-                    <p>
-                        <%= content %>
-                    </p>
-                    <% } %>
-        </section>
+            <div class="favorites-section">
+
+                <h3>⭐ Favorites</h3>
+
+                <% if(favorites && favorites.length){ %>
+
+                    <% favorites.forEach(item=> { %>
+
+                        <div class="favorite-row">
+
+                            <a class="favorite-item"
+                                href="/favorite-weather?city=<%= item.city %>&country=<%= item.country %>">
+
+                                <%= item.city %>, <%= item.country %>
+
+                            </a>
+
+                            <a class="delete-btn"
+                                href="/delete-favorite?city=<%= item.city %>&country=<%= item.country %>">
+
+                                ✕
+
+                            </a>
+
+                        </div>
+
+                        <% }) %>
+
+                            <% } else { %>
+
+                                <p>No favorites yet</p>
+
+                                <% } %>
+
+            </div>
+
+
+        </aside>
+
+        <main class="dashboard">
+
+            <div class="container">
+
+                <header class="header">
+                    <h1>🌤 Weather Dashboard</h1>
+                    <p>Check real-time weather anywhere</p>
+                </header>
+
+                <section class="form-section">
+                    <form action="/get-forecast" method="POST" class="weather-form">
+
+                        <div class="input-group">
+
+                            <input type="text" name="city" placeholder="🔍 Search city..." required />
+
+                            <input type="text" name="code" placeholder="Country Code" required />
+
+                        </div>
+
+                        <button type="submit" class="btn-primary">Get Weather</button>
+                        <button type="button" id="locationBtn" class="btn-primary">
+                            📍 Use My Current Location
+                        </button>
+                    </form>
+                </section>
+
+                <section class="result-section">
+                    <% if (content && content.main) { %>
+
+                        <div class="weather-card">
+                            <div class="location-header">
+
+                                <div>
+
+                                    <h2>
+                                        <%= content.name %>, <%= content.sys.country %>
+                                    </h2>
+
+                                    <p class="current-time">
+                                        <%= new Date().toLocaleString() %>
+                                    </p>
+
+                                </div>
+
+                                <form action="/favorite" method="POST">
+
+                                    <input type="hidden" name="city" value="<%= content.name %>" />
+
+                                    <input type="hidden" name="country" value="<%= content.sys.country %>" />
+
+                                    <button class="favorite-btn">
+                                        ⭐ Favorite
+                                    </button>
+
+                                </form>
+
+                            </div>
+
+                            <div class="weather-main">
+
+                                <img class="weather-icon"
+                                    src="https://openweathermap.org/img/wn/<%= content.weather[0].icon %>@2x.png"
+                                    alt="weather icon" />
+
+                                <div>
+
+                                    <h1>
+                                        <%= Math.round(content.main.temp) %>°C
+                                    </h1>
+
+                                    <h3 class="weather-status">
+                                        <%= content.weather[0].description %>
+                                    </h3>
+
+                                </div>
+
+                            </div>
+
+                            <!-- <p class="description">
+                                        <%= content.weather[0].description %>
+                                    </p> -->
+
+                            <div class="weather-details">
+
+                                <div>
+                                    <span>Feels Like</span>
+                                    <p>
+                                        <%= Math.round(content.main.feels_like) %>°C
+                                    </p>
+                                </div>
+
+                                <div>
+                                    <span>Humidity</span>
+                                    <p>
+                                        <%= content.main.humidity %>%
+                                    </p>
+                                </div>
+
+                                <div>
+                                    <span>Wind</span>
+                                    <p>
+                                        <%= content.wind.speed %> m/s
+                                    </p>
+                                </div>
+
+                                <div>
+                                    <span>Visibility</span>
+                                    <p>
+                                        <%= content.visibility / 1000 %> km
+                                    </p>
+                                </div>
+
+                                <div>
+                                    <span>Pressure</span>
+                                    <p>
+                                        <%= content.main.pressure %> hPa
+                                    </p>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <% if (forecast) { %>
+                            <div class="hourly-card">
+
+                                <h3>Hourly Forecast</h3>
+
+                                <div class="hourly-grid">
+
+                                    <% forecast.list.slice(0, 6).forEach(hour=> { %>
+
+                                        <div class="hour-item">
+
+                                            <p>
+                                                <%= new Date(hour.dt_txt).toLocaleTimeString([], { hour: "numeric" ,
+                                                    minute: "2-digit" }) %>
+                                            </p>
+
+                                            <span>
+                                                <img src="https://openweathermap.org/img/wn/<%= hour.weather[0].icon %>@2x.png"
+                                                    alt="weather icon" width="50" />
+                                            </span>
+
+                                            <h4>
+                                                <%= Math.round(hour.main.temp) %>°
+                                            </h4>
+
+                                        </div>
+
+                                        <% }) %>
+
+                                </div>
+
+                            </div>
+                            <% } %>
+
+                                <% if (dailyForecast && dailyForecast.length) { %>
+
+                                    <div class="forecast-section">
+
+                                        <h3>5-Day Forecast</h3>
+
+                                        <div class="forecast-grid">
+
+                                            <% dailyForecast.forEach(day=> { %>
+
+                                                <div class="forecast-card">
+
+                                                    <p>
+                                                        <%= new Date(day.dt_txt).toLocaleDateString([], {
+                                                            weekday: "short" }) %>
+                                                    </p>
+
+                                                    <img src="https://openweathermap.org/img/wn/<%= day.weather[0].icon %>@2x.png"
+                                                        alt="weather icon" />
+
+                                                    <h4>
+                                                        <%= Math.round(day.main.temp) %>°
+                                                    </h4>
+
+                                                    <small>
+                                                        <%= day.weather[0].description %>
+                                                    </small>
+
+                                                </div>
+
+                                                <% }) %>
+
+                                        </div>
+
+                                    </div>
+
+                                    <% } %>
+
+                                        <% } else {%>
+                                            <p>
+                                                <%= content %>
+                                            </p>
+                                            <% } %>
+                </section>
+
+            </div>
+
+        </main>
 
     </div>
+
+    <script>
+        const lastCity = "<%= typeof lastCity !== 'undefined' ? lastCity : '' %>";
+        const lastCountry = "<%= typeof lastCountry !== 'undefined' ? lastCountry : '' %>";
+    </script>
+
+    <script>
+        if (lastCity && lastCountry) {
+
+            localStorage.setItem("lastCity", lastCity);
+            localStorage.setItem("lastCountry", lastCountry);
+
+        }
+
+        const locationBtn = document.getElementById("locationBtn");
+
+        function getLocation() {
+
+            if (!navigator.geolocation) {
+                alert("Geolocation is not supported by your browser.");
+                return;
+            }
+
+            navigator.geolocation.getCurrentPosition(
+
+                (position) => {
+
+                    localStorage.setItem("locationPermission", "allowed");
+
+                    const latitude = position.coords.latitude;
+                    const longitude = position.coords.longitude;
+
+                    window.location.href =
+                        `/current-location?lat=${latitude}&lon=${longitude}`;
+
+                },
+
+                () => {
+
+                    localStorage.setItem("locationPermission", "denied");
+
+                }
+
+            );
+
+        }
+
+        // Button still works
+        locationBtn.addEventListener("click", getLocation);
+
+        // Automatically get location only if no weather is already displayed
+        window.onload = function () {
+
+            const weatherCard = document.querySelector(".weather-card");
+
+            if (weatherCard) return;
+
+            const lastCity = localStorage.getItem("lastCity");
+            const lastCountry = localStorage.getItem("lastCountry");
+
+            if (lastCity && lastCountry) {
+
+                window.location.href =
+                    `/favorite-weather?city=${lastCity}&country=${lastCountry}`;
+
+                return;
+
+            }
+
+            const permission =
+                localStorage.getItem("locationPermission");
+
+            if (permission === "denied") return;
+
+            getLocation();
+
+        };
+    </script>
 </body>
+
+
+
 
 </html>
