@@ -17,6 +17,8 @@
     <div class="asteroid asteroid-1"></div>
     <div class="asteroid asteroid-2"></div>
 
+    <div id="weather-effects"></div>
+
     <div class="app-layout">
 
         <aside class="sidebar">
@@ -140,7 +142,9 @@
                                     </h2>
 
                                     <p class="current-time">
-                                        <%= new Date().toLocaleString() %>
+                                        <%= new Date((content.dt + content.timezone) * 1000) .toLocaleString("en-US", {
+                                            weekday: "short" , day: "numeric" , month: "short" , hour: "numeric" ,
+                                            minute: "2-digit" }) %>
                                     </p>
 
                                 </div>
@@ -220,6 +224,37 @@
                                     </p>
                                 </div>
 
+                                <div>
+                                    <span>Sunrise</span>
+
+                                    <p>
+                                        <%= new Date(content.sys.sunrise * 1000).toLocaleTimeString([], {
+                                            hour: "numeric" , minute: "2-digit" }) %>
+                                    </p>
+                                </div>
+
+                                <div>
+                                    <span>Sunset</span>
+
+                                    <p>
+                                        <%= new Date(content.sys.sunset * 1000).toLocaleTimeString([], { hour: "numeric"
+                                            , minute: "2-digit" }) %>
+                                    </p>
+                                </div>
+
+                                <div>
+                                    <span>Air Quality</span>
+
+                                    <p>
+
+                                        <% const levels=[ "" , "Good" , "Fair" , "Moderate" , "Poor" , "Very Poor" ]; %>
+
+                                            <%= levels[airQuality.list[0].main.aqi] %>
+
+                                    </p>
+
+                                </div>
+
                             </div>
 
                         </div>
@@ -296,10 +331,18 @@
 
                                     <% } %>
 
-                                        <% } else {%>
-                                            <p>
-                                                <%= content %>
-                                            </p>
+                                        <% } else { %>
+
+                                            <div class="error-card">
+
+                                                <h2>⚠️</h2>
+
+                                                <p>
+                                                    <%= content %>
+                                                </p>
+
+                                            </div>
+
                                             <% } %>
                 </section>
 
@@ -309,9 +352,16 @@
 
     </div>
 
+    <div id="loading-screen">
+        <div class="spinner"></div>
+        <p>Loading weather...</p>
+    </div>
+
     <script>
         const lastCity = "<%= typeof lastCity !== 'undefined' ? lastCity : '' %>";
         const lastCountry = "<%= typeof lastCountry !== 'undefined' ? lastCountry : '' %>";
+        const weatherMain =
+            "<%= content && content.weather ? content.weather[0].main : '' %>";
     </script>
 
     <script>
@@ -362,8 +412,9 @@
         window.onload = function () {
 
             const weatherCard = document.querySelector(".weather-card");
+            const errorCard = document.querySelector(".error-card");
 
-            if (weatherCard) return;
+            if (weatherCard || errorCard) return;
 
             const lastCity = localStorage.getItem("lastCity");
             const lastCountry = localStorage.getItem("lastCountry");
@@ -385,7 +436,127 @@
             getLocation();
 
         };
+
+        const weatherForm = document.querySelector(".weather-form");
+
+        if (weatherForm) {
+            weatherForm.addEventListener("submit", () => {
+                document.getElementById("loading-screen").style.display = "flex";
+            });
+        }
+
+        function applyWeatherEffects() {
+
+            switch (weatherMain) {
+
+                case "Clear":
+                    createSunRays();
+                    break;
+
+                case "Rain":
+                case "Drizzle":
+                    createRain();
+                    break;
+
+                case "Snow":
+                    createSnow();
+                    break;
+
+                case "Thunderstorm":
+                    createThunder();
+                    break;
+
+            }
+
+        }
+
+        applyWeatherEffects();
+
+        function createRain() {
+
+            const container =
+                document.getElementById("weather-effects");
+
+            for (let i = 0; i < 150; i++) {
+
+                const drop = document.createElement("div");
+
+                drop.className = "rain-drop";
+
+                drop.style.left = Math.random() * 100 + "vw";
+
+                drop.style.animationDelay =
+                    Math.random() * 2 + "s";
+
+                drop.style.animationDuration =
+                    0.8 + Math.random() + "s";
+
+                container.appendChild(drop);
+
+            }
+
+        }
+
+        function createSunRays() {
+
+            const container = document.getElementById("weather-effects");
+
+            const sun = document.createElement("div");
+            sun.className = "sun";
+
+            const rays = document.createElement("div");
+            rays.className = "sun-rays";
+
+            container.appendChild(rays);
+            container.appendChild(sun);
+
+        }
+
+        function createSnow() {
+
+            const container =
+                document.getElementById("weather-effects");
+
+            for (let i = 0; i < 80; i++) {
+
+                const flake = document.createElement("div");
+
+                flake.className = "snowflake";
+
+                flake.innerHTML = "❄";
+
+                flake.style.left =
+                    Math.random() * 100 + "vw";
+
+                flake.style.animationDelay =
+                    Math.random() * 5 + "s";
+
+                flake.style.fontSize =
+                    10 + Math.random() * 15 + "px";
+
+                container.appendChild(flake);
+
+            }
+
+        }
+
+        function createThunder() {
+
+            const container =
+                document.getElementById("weather-effects");
+
+            const flash = document.createElement("div");
+
+            flash.className = "lightning-flash";
+
+            container.appendChild(flash);
+
+        }
+
+
     </script>
+
+
 </body>
 
 

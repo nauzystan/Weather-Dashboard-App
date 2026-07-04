@@ -56,6 +56,14 @@ async function getWeatherData(lat, lon) {
     },
   });
 
+  const airQuality = await axios.get(API_URL + "/data/2.5/air_pollution", {
+    params: {
+      lat,
+      lon,
+      appid: yourAPIKey,
+    },
+  });
+
   const dailyForecast = forecast.data.list.filter((item) =>
     item.dt_txt.includes("12:00:00"),
   );
@@ -64,6 +72,7 @@ async function getWeatherData(lat, lon) {
     weather: weather.data,
     forecast: forecast.data,
     dailyForecast,
+    airQuality: airQuality.data,
   };
 }
 
@@ -74,7 +83,7 @@ async function loadWeather(city, country) {
     return null;
   }
 
-  const { weather, forecast, dailyForecast } = await getWeatherData(
+  const { weather, forecast, dailyForecast, airQuality } = await getWeatherData(
     geo[0].lat,
     geo[0].lon,
   );
@@ -83,6 +92,7 @@ async function loadWeather(city, country) {
     content: weather,
     forecast,
     dailyForecast,
+    airQuality,
     searchHistory,
     favorites,
     lastCity: city,
@@ -90,11 +100,12 @@ async function loadWeather(city, country) {
   };
 }
 
-function buildResponseData(weather, forecast, dailyForecast) {
+function buildResponseData(weather, forecast, dailyForecast, airQuality) {
   return {
     content: weather,
     forecast,
     dailyForecast,
+    airQuality,
     searchHistory,
     favorites,
   };
@@ -117,6 +128,20 @@ app.post("/get-forecast", async (req, res) => {
     const name = req.body.city;
     const countryCode = req.body.code;
 
+    if (!name.trim() || !countryCode.trim()) {
+      return res.render("index.ejs", {
+        content: "Please enter both city and country code.",
+
+        forecast: null,
+
+        dailyForecast: null,
+
+        searchHistory,
+
+        favorites,
+      });
+    }
+
     const cacheKey = `${name.toLowerCase()}-${countryCode.toLowerCase()}`;
 
     const cache = weatherCache[cacheKey];
@@ -136,9 +161,6 @@ app.post("/get-forecast", async (req, res) => {
 
     //Step 1: Get lat & lon coordinates from geo API
 
-    searchHistory.unshift(`${name}, ${countryCode}`);
-    searchHistory = searchHistory.slice(0, 5);
-
     const responseData = await loadWeather(name, countryCode);
 
     if (!responseData) {
@@ -150,6 +172,11 @@ app.post("/get-forecast", async (req, res) => {
         favorites,
       });
     }
+
+    const search = `${name}, ${countryCode}`;
+    searchHistory = searchHistory.filter((item) => item !== search);
+    searchHistory.unshift(search);
+    searchHistory = searchHistory.slice(0, 5);
 
     console.log(responseData.forecast.list.slice(0, 5));
 
@@ -166,13 +193,34 @@ app.post("/get-forecast", async (req, res) => {
 
     res.render("index.ejs", responseData);
   } catch (error) {
-    console.error(error);
+    console.error(error.message);
+
+    let message = "Something went wrong. Please try again.";
+
+    if (error.code === "ECONNABORTED") {
+      message = "Request timed out.";
+    } else if (error.code === "ENOTFOUND") {
+      message = "No internet connection.";
+    } else if (error.response) {
+      if (error.response.status === 401) {
+        message = "Invalid API key.";
+      } else if (error.response.status === 404) {
+        message = "Location not found.";
+      } else if (error.response.status >= 500) {
+        message = "Weather service is temporarily unavailable.";
+      }
+    }
 
     res.render("index.ejs", {
-      content: "Unable to retrieve weather data.",
+      content: message,
+
       forecast: null,
+
       dailyForecast: null,
+
       searchHistory,
+
+      favorites,
     });
   }
 });
@@ -184,11 +232,12 @@ app.get("/current-location", async (req, res) => {
 
     console.log(lat, lon);
 
-    const { weather, forecast, dailyForecast } = await getWeatherData(lat, lon);
+    const { weather, forecast, dailyForecast, airQuality } =
+      await getWeatherData(lat, lon);
 
     res.render(
       "index.ejs",
-      buildResponseData(weather, forecast, dailyForecast),
+      buildResponseData(weather, forecast, dailyForecast, airQuality),
     );
   } catch (error) {
     console.log(error.message);
@@ -215,7 +264,7 @@ app.get("/favorite-weather", async (req, res) => {
   }
 });
 
-app.post("/favorite", (req, res) => {
+app.post("/favorite", async (req, res) => {
   const city = req.body.city;
   const country = req.body.country;
 
@@ -229,11 +278,12 @@ app.post("/favorite", (req, res) => {
       country,
     });
   }
+  const responseData = await loadWeather(city, country);
 
-  res.redirect("/");
+  res.render("index.ejs", responseData);
 });
 
-app.get("/delete-favorite", (req, res) => {
+app.get("/delete-favorite", async (req, res) => {
   const city = req.query.city;
   const country = req.query.country;
 
@@ -241,7 +291,9 @@ app.get("/delete-favorite", (req, res) => {
     return !(item.city === city && item.country === country);
   });
 
-  res.redirect("/");
+  const responseData = await loadWeather(city, country);
+
+  res.render("index.ejs", responseData);
 });
 
 //Start server
