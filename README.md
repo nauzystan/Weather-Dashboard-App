@@ -1,104 +1,217 @@
-# 🌤 Weather Dashboard App
+# 🌤️ Weather Dashboard
 
-A simple weather web application built with Node.js, Express, EJS, and Axios.
-It allows users to enter a city and country code to retrieve real-time weather data using the OpenWeather API.
+A modern weather dashboard built with **Node.js**, **Express.js**, **EJS**, and the **OpenWeather API**. The application provides real-time weather information, hourly and multi-day forecasts, interactive weather animations, favorites, search history, customizable settings, and a beautiful space-inspired glassmorphism interface.
 
 ---
 
 ## 🚀 Features
 
-- Search weather by city and country
-- Displays:
-  - Temperature
-  - Weather condition
-  - Humidity
-  - Wind speed
+### 🌍 Real-Time Weather
 
-- Clean and responsive UI
-- Uses real-time API data
+- Search weather by city and country.
+- Current weather conditions.
+- Feels like temperature.
+- Humidity.
+- Wind speed.
+- Atmospheric pressure.
+- Visibility.
+- Sunrise & Sunset.
+- Air Quality Index.
+
+### 📅 Forecasts
+
+- Hourly weather forecast.
+- 4-day weather forecast.
+
+### ⭐ Favorites
+
+- Save favorite locations.
+- View all saved cities.
+- Remove favorites.
+
+### 🕘 Search History
+
+- Automatically stores previous searches.
+- Quickly revisit previous locations.
+- Clear search history.
+
+### ⚙️ Settings
+
+- Toggle Temperature Unit (°C / °F)
+- Light & Dark Themes
+- Weather Animation Toggle
+
+### 🌌 Interactive Weather Effects
+
+Weather conditions dynamically generate visual effects such as:
+
+- ☀️ Animated Sunshine
+- 🌧️ Rain
+- ❄️ Snow
+- ⚡ Lightning
+- 🌠 Shooting Stars
+- ☄️ Floating Asteroids
+
+### 🎨 UI
+
+- Glassmorphism design
+- Responsive layout
+- Toast notifications
+- Loading screen
+- Animated transitions
+- Space-themed interface
+
+### 💾 Persistent Preferences
+
+- Theme persistence
+- Temperature unit persistence
+- Animation preference persistence
+- Last searched location persistence
 
 ---
 
-## 🛠 Tech Stack
+# 🛠️ Technologies Used
 
 - Node.js
 - Express.js
-- EJS (Templating)
-- Axios (API requests)
-- CSS (Styling)
+- EJS
+- HTML5
+- CSS3
+- JavaScript
+- OpenWeather API
+- Client-side state management using Local Storage
+- Persistent user preferences
 
 ---
 
-## 📦 Installation
-
-1. Clone the repository:
+# 📂 Project Structure
 
 ```
-git clone <your-repo-link>
-cd <your-folder-name>
+Weather Dashboard
+│
+├── public/
+│   ├── css/
+│   ├── js/
+│   ├── images/
+│
+├── views/
+│   ├── index.ejs
+│   ├── favorites.ejs
+│   ├── history.ejs
+│   └── settings.ejs
+│
+├── app.js
+├── package.json
+└── README.md
 ```
 
-2. Install dependencies:
+---
 
+# 📦 Installation
+
+Clone the repository
+
+```bash
+git clone https://github.com/YOUR_USERNAME/weather-dashboard.git
 ```
+
+Move into the project
+
+```bash
+cd weather-dashboard
+```
+
+Install dependencies
+
+```bash
 npm install
 ```
 
----
+Create a `.env` file
 
-## 🔑 API Key Setup
-
-1. Go to https://openweathermap.org/api
-2. Create an account and generate an API key
-3. Replace this in `index.js`:
-
-```js
-const yourAPIKey = "YOUR_API_KEY_HERE";
+```env
+API_KEY=YOUR_OPENWEATHER_API_KEY
 ```
 
-OR Create a `.env` file in the root:
+Start the server
 
-```js
-
-OPENWEATHER_API_KEY=your_api_key_here
-
+```bash
+node app.js
 ```
 
-## ▶️ Running the App
+or
 
-Start the server:
-
-```
-node index.js
+```bash
+nodemon app.js
 ```
 
-```
-OR (if you have nodemon installed):
-
-nodemon index.js
-```
-
-
-## 🌐 Open in Browser
+Open
 
 ```
-Visit:
 http://localhost:3000
 ```
 
+---
 
-## 📁 Project Structure
+# 🌍 API
 
-```
-Weather Dashboard App/
-│── public/
-│ └── styles/
-│ └── main.css
-│
-│── views/
-│ └── index.ejs
-│
-│── index.js
-│── package.json
+This project uses the **OpenWeather API**
 
-```
+https://openweathermap.org/api
+
+Endpoints used include:
+
+- Current Weather
+- 5 Day / 3 Hour Forecast
+- Air Pollution API
+- Reverse Geocoding
+
+---
+
+# 📸 Screens
+
+- Dashboard
+- Favorites
+- Search History
+- Settings
+- Responsive Mobile Layout
+
+_(More Screenshots coming soon.)_
+
+---
+
+# 💡 Future Improvements
+
+- Live temperature conversion without refresh
+- User authentication
+- Database storage for favorites/history
+- Weather maps
+- PWA support
+- Multi-language support
+- Severe weather alerts
+- Geolocation improvements
+- Charts & analytics
+
+---
+
+# 👨‍💻 Developer
+
+**Gabriel Chinonso Stanley**
+
+Electrical Engineer | Backend Engineer | Tech Support Engineer
+
+LinkedIn
+
+https://www.linkedin.com/in/chinonso-gabriel-535b42176/
+
+GitHub
+
+https://github.com/nauzystan
+
+---
+
+# 📜 License
+
+This project is licensed under the MIT License.
+
+Feel free to fork, improve and contribute.
