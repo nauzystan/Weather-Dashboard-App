@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Favorites</title>
+
+    <script>
+        if (localStorage.getItem("theme") === "Light") {
+            document.documentElement.classList.add("light-theme");
+        }
+    </script>
+
+    <link rel="stylesheet" href="/styles/main.css">
+</head>
+
+<body>
+    <div class="shooting-star star-1"></div>
+    <div class="shooting-star star-2"></div>
+    <div class="shooting-star star-3"></div>
+
+    <div class="asteroid asteroid-1"></div>
+    <div class="asteroid asteroid-2"></div>
+
+    <script>
+        if (localStorage.getItem("animations") === "Off") {
+            document.querySelectorAll(".shooting-star,.asteroid").forEach(el => {
+                el.style.display = "none";
+            });
+        }
+    </script>
+
+    <div id="weather-effects"></div>
+
+    <main class="dashboard">
+        <div class="container">
+
+            <header class="header">
+
+                <h1>⚙️ Settings</h1>
+
+                <nav class="top-nav">
+                    <a href="#" id="dashboardLink">Dashboard</a>
+                    <a href="/favorites">Favorites</a>
+                    <a href="/history">History</a>
+                    <a href="/settings" class="active">Settings</a>
+                </nav>
+
+            </header>
+
+            <div class="settings-grid">
+
+                <div class="setting-card">
+                    <div>
+                        <h3>Temperature Unit</h3>
+                        <p>Choose your preferred unit.</p>
+                    </div>
+
+                    <button id="unitToggle" class="setting-btn">°C</button>
+                </div>
+
+                <div class="setting-card">
+                    <div>
+                        <h3>Theme</h3>
+                        <p>Switch between dark and light mode.</p>
+                    </div>
+
+                    <button id="themeToggle" class="setting-btn">Dark</button>
+                </div>
+
+                <div class="setting-card">
+                    <div>
+                        <h3>Weather Animations</h3>
+                        <p>Enable or disable visual effects.</p>
+                    </div>
+
+                    <button id="animationToggle" class="setting-btn">On</button>
+                </div>
+
+            </div>
+
+
+
+        </div>
+
+    </main>
+
+    <div id="toast"></div>
+
+    <script>
+        const dashboardLink = document.getElementById("dashboardLink");
+
+        dashboardLink?.addEventListener("click", (e) => {
+            e.preventDefault();
+
+            const city = localStorage.getItem("lastCity");
+            const country = localStorage.getItem("lastCountry");
+
+            if (city && country) {
+                window.location.href = `/favorite-weather?city=${city}&country=${country}`;
+            } else {
+                window.location.href = "/";
+            }
+        });
+
+        const unitBtn = document.getElementById("unitToggle");
+        const themeBtn = document.getElementById("themeToggle");
+        const animationBtn = document.getElementById("animationToggle");
+
+        // Temperature
+        let unit = localStorage.getItem("unit") || "C";
+        unitBtn.textContent = `°${unit}`;
+
+        unitBtn?.addEventListener("click", () => {
+            unit = unit === "C" ? "F" : "C";
+            localStorage.setItem("unit", unit);
+            if (unitBtn) {
+                unitBtn.textContent = `°${unit}`;
+            }
+
+            // applyUnit();
+
+            showToast(`Temperature changed to °${unit}`);
+        });
+
+        // Theme
+        let theme = localStorage.getItem("theme") || "Dark";
+        themeBtn.textContent = theme;
+
+        applyTheme();
+
+        themeBtn?.addEventListener("click", () => {
+            theme = theme === "Dark" ? "Light" : "Dark";
+
+            localStorage.setItem("theme", theme);
+
+            if (themeBtn) {
+                themeBtn.textContent = theme;
+            }
+            applyTheme();
+
+            showToast(`${theme} mode enabled`);
+        });
+
+        function applyTheme() {
+            document.documentElement.classList.toggle(
+                "light-theme",
+                theme === "Light"
+            );
+        }
+
+        // Animations
+        let animations = localStorage.getItem("animations") || "On";
+        animationBtn.textContent = animations;
+
+        applyAnimations();
+
+        animationBtn?.addEventListener("click", () => {
+            animations = animations === "On" ? "Off" : "On";
+            localStorage.setItem("animations", animations);
+            if (animationBtn) {
+                animationBtn.textContent = animations;
+            }
+            applyAnimations();
+
+            showToast(`Animations ${animations}`);
+        });
+
+        function applyAnimations() {
+            const shootingStars = document.querySelectorAll(".shooting-star");
+            const asteroids = document.querySelectorAll(".asteroid");
+
+            if (animations === "Off") {
+                shootingStars.forEach(el => el.style.display = "none");
+                asteroids.forEach(el => el.style.display = "none");
+            } else {
+                shootingStars.forEach(el => el.style.display = "");
+                asteroids.forEach(el => el.style.display = "");
+            }
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById("toast");
+
+            toast.textContent = message;
+
+            toast.classList.add("show");
+
+            setTimeout(() => {
+                toast.classList.remove("show");
+            }, 2500);
+        }
+    </script>
+
+
+
+</body>
+
+</html>

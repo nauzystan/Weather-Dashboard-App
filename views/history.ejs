@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Favorites</title>
+
+    <script>
+        if (localStorage.getItem("theme") === "Light") {
+            document.documentElement.classList.add("light-theme");
+        }
+    </script>
+
+    <link rel="stylesheet" href="/styles/main.css">
+</head>
+
+<body>
+
+    <div class="shooting-star star-1"></div>
+    <div class="shooting-star star-2"></div>
+    <div class="shooting-star star-3"></div>
+
+    <div class="asteroid asteroid-1"></div>
+    <div class="asteroid asteroid-2"></div>
+
+    <main class="dashboard">
+
+        <div class="container">
+
+            <header class="header">
+
+                <h1>🕒 Search History</h1>
+
+                <nav class="top-nav">
+                    <a href="#" id="dashboardLink">Dashboard</a>
+                    <a href="/favorites">Favorites</a>
+                    <a href="/history" class="active">History</a>
+                    <a href="/settings">Settings</a>
+                </nav>
+
+            </header>
+
+            <div class="history-actions">
+                <a href="/clear-history" class="clear-history-btn">
+                    🗑 Clear History
+                </a>
+            </div>
+
+            <div class="history-list">
+
+                <% if(history.length){ %>
+
+                    <% history.forEach(item=>{ %>
+
+                        <a class="history-card"
+                            href="/favorite-weather?city=<%= item.city %>&country=<%= item.country %>">
+
+                            <div>
+                                <h3>
+                                    <%= item.city %>, <%= item.country %>
+                                </h3>
+
+                                <p>
+                                    <%= new Date(item.searchedAt).toLocaleString([], { month: "short" , day: "numeric" ,
+                                        hour: "numeric" , minute: "2-digit" }) %>
+                                </p>
+                            </div>
+
+                            <span>↗</span>
+
+                        </a>
+
+                        <% }) %>
+
+                            <% } else { %>
+
+                                <div class="empty-card">
+                                    No searches yet.
+                                </div>
+
+                                <% } %>
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <div id="toast"></div>
+
+    <script>
+        const dashboardLink = document.getElementById("dashboardLink");
+
+        dashboardLink?.addEventListener("click", (e) => {
+            e.preventDefault();
+
+            const city = localStorage.getItem("lastCity");
+            const country = localStorage.getItem("lastCountry");
+
+            if (city && country) {
+                window.location.href = `/favorite-weather?city=${city}&country=${country}`;
+            } else {
+                window.location.href = "/";
+            }
+        });
+    </script>
+
+
+
+    <script>
+        function showToast(message) {
+            const toast = document.getElementById("toast");
+
+            toast.textContent = message;
+
+            toast.classList.add("show");
+
+            setTimeout(() => {
+                toast.classList.remove("show");
+            }, 2500);
+        }
+
+
+        const params = new URLSearchParams(window.location.search);
+
+        if (params.get("toast") === "cleared") {
+            showToast("🗑 History cleared");
+        }
+    </script>
+
+
+
+</body>
+
+
+
+</html>

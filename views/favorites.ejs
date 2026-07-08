@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Favorites</title>
+
+    <script>
+        if (localStorage.getItem("theme") === "Light") {
+            document.documentElement.classList.add("light-theme");
+        }
+    </script>
+
+    <link rel="stylesheet" href="/styles/main.css">
+</head>
+
+<body>
+    <div class="shooting-star star-1"></div>
+    <div class="shooting-star star-2"></div>
+    <div class="shooting-star star-3"></div>
+
+    <div class="asteroid asteroid-1"></div>
+    <div class="asteroid asteroid-2"></div>
+
+    <div id="weather-effects"></div>
+
+    <main class="dashboard">
+
+        <div class="container">
+
+            <header class="header">
+
+                <h1>⭐ Favorites</h1>
+
+                <nav class="top-nav">
+                    <a href="#" id="dashboardLink">Dashboard</a>
+                    <a href="/favorites" class="active">Favorites</a>
+                    <a href="/history">History</a>
+                    <a href="/settings">Settings</a>
+                </nav>
+
+            </header>
+
+            <div class="favorites-grid">
+
+                <% if(favorites.length){ %>
+
+                    <% favorites.forEach(item=>{ %>
+
+                        <div class="favorite-card">
+
+                            <div class="favorite-top">
+
+                                <a class="favorite-link"
+                                    href="/favorite-weather?city=<%= item.city %>&country=<%= item.country %>">
+
+                                    <div>
+                                        <h3>
+                                            <%= item.city %>
+                                        </h3>
+                                        <p>
+                                            <%= item.country %>
+                                        </p>
+                                    </div>
+
+                                </a>
+
+                                <a class="delete-favorite"
+                                    href="/delete-favorite?city=<%= item.city %>&country=<%= item.country %>">
+                                    🗑
+                                </a>
+
+                            </div>
+
+                            <div class="favorite-bottom">
+
+                                <img src="https://openweathermap.org/img/wn/<%= item.icon %>@2x.png">
+
+                                <h2>
+                                    <%= item.temp %>°C
+                                </h2>
+
+                                <span>
+                                    <%= item.description %>
+                                </span>
+
+                                <small>
+                                    Feels like <%= item.feelsLike %>°C • <%= item.humidity %>% Humidity
+                                </small>
+
+                            </div>
+
+                        </div>
+
+                        <% }) %>
+
+                            <% } else { %>
+
+                                <div class="empty-card">
+                                    No favorites yet.
+                                </div>
+
+                                <% } %>
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <div id="toast"></div>
+
+    <script>
+        const dashboardLink = document.getElementById("dashboardLink");
+
+        dashboardLink?.addEventListener("click", (e) => {
+            e.preventDefault();
+
+            const city = localStorage.getItem("lastCity");
+            const country = localStorage.getItem("lastCountry");
+
+            if (city && country) {
+                window.location.href = `/favorite-weather?city=${city}&country=${country}`;
+            } else {
+                window.location.href = "/";
+            }
+        });
+    </script>
+
+
+
+    <script>
+        function showToast(message) {
+            const toast = document.getElementById("toast");
+
+            toast.textContent = message;
+
+            toast.classList.add("show");
+
+            setTimeout(() => {
+                toast.classList.remove("show");
+            }, 2500);
+        }
+
+        const params = new URLSearchParams(window.location.search);
+
+        if (params.get("toast") === "removed") {
+            showToast("🗑 Favorite removed");
+        }
+    </script>
+
+
+
+</body>
+
+</html>

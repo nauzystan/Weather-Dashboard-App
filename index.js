@@ -77,16 +77,22 @@ async function getWeatherData(lat, lon) {
 }
 
 async function loadWeather(city, country) {
+  console.log("Loading weather...");
+
   const geo = await getCoordinates(city, country);
 
   if (!geo.length) {
     return null;
   }
 
+  console.log("Coordinates found");
+
   const { weather, forecast, dailyForecast, airQuality } = await getWeatherData(
     geo[0].lat,
     geo[0].lon,
   );
+
+  console.log("Weather data received");
 
   return {
     content: weather,
@@ -173,12 +179,17 @@ app.post("/get-forecast", async (req, res) => {
       });
     }
 
-    const search = `${name}, ${countryCode}`;
-    searchHistory = searchHistory.filter((item) => item !== search);
-    searchHistory.unshift(search);
-    searchHistory = searchHistory.slice(0, 5);
+    searchHistory = searchHistory.filter(
+      (item) => !(item.city === name && item.country === countryCode),
+    );
 
-    console.log(responseData.forecast.list.slice(0, 5));
+    searchHistory.unshift({
+      city: name,
+      country: countryCode,
+      searchedAt: new Date(),
+    });
+
+    searchHistory = searchHistory.slice(0, 6);
 
     //Send weather data to frontend
 
@@ -245,6 +256,22 @@ app.get("/current-location", async (req, res) => {
   }
 });
 
+app.get("/history", (req, res) => {
+  res.render("history.ejs", {
+    history: searchHistory,
+  });
+});
+
+app.get("/settings", (req, res) => {
+  res.render("settings.ejs");
+});
+
+app.get("/favorites", (req, res) => {
+  res.render("favorites.ejs", {
+    favorites,
+  });
+});
+
 app.get("/favorite-weather", async (req, res) => {
   try {
     const city = req.query.city;
@@ -255,6 +282,18 @@ app.get("/favorite-weather", async (req, res) => {
     if (!responseData) {
       return res.redirect("/");
     }
+
+    searchHistory = searchHistory.filter(
+      (item) => !(item.city === city && item.country === country),
+    );
+
+    searchHistory.unshift({
+      city,
+      country,
+      searchedAt: new Date(),
+    });
+
+    searchHistory = searchHistory.slice(0, 6);
 
     res.render("index.ejs", responseData);
   } catch (error) {
@@ -272,15 +311,21 @@ app.post("/favorite", async (req, res) => {
     (item) => item.city === city && item.country === country,
   );
 
+  const responseData = await loadWeather(city, country);
+
   if (!exists) {
     favorites.push({
       city,
       country,
+      temp: Math.round(responseData.content.main.temp),
+      feelsLike: Math.round(responseData.content.main.feels_like),
+      humidity: responseData.content.main.humidity,
+      description: responseData.content.weather[0].description,
+      icon: responseData.content.weather[0].icon,
     });
   }
-  const responseData = await loadWeather(city, country);
 
-  res.render("index.ejs", responseData);
+  res.redirect(`/favorite-weather?city=${city}&country=${country}&toast=added`);
 });
 
 app.get("/delete-favorite", async (req, res) => {
@@ -293,7 +338,12 @@ app.get("/delete-favorite", async (req, res) => {
 
   const responseData = await loadWeather(city, country);
 
-  res.render("index.ejs", responseData);
+  res.redirect("/favorites?toast=removed");
+});
+
+app.get("/clear-history", (req, res) => {
+  searchHistory = [];
+  res.redirect("/history?toast=cleared");
 });
 
 //Start server
