@@ -89,60 +89,87 @@
     <div id="toast"></div>
 
     <script>
+        // Navigate back to the last searched location when Dashboard is clicked
         const dashboardLink = document.getElementById("dashboardLink");
 
         dashboardLink?.addEventListener("click", (e) => {
             e.preventDefault();
 
-            const city = localStorage.getItem("lastCity");
-            const country = localStorage.getItem("lastCountry");
+            // Retrieve the last searched location from local storage
+            const lat = localStorage.getItem("lastLat");
+            const lon = localStorage.getItem("lastLon");
 
-            if (city && country) {
-                window.location.href = `/favorite-weather?city=${city}&country=${country}`;
+            // If a previous search exists, reload it; otherwise return to the home page
+            if (lat && lon) {
+                window.location.href = `/favorite-weather?lat=${lat}&lon=${lon}`;
             } else {
                 window.location.href = "/";
             }
         });
 
+        // Settings buttons
         const unitBtn = document.getElementById("unitToggle");
         const themeBtn = document.getElementById("themeToggle");
         const animationBtn = document.getElementById("animationToggle");
 
-        // Temperature
+        /* ===========================
+           Temperature Preference
+        =========================== */
+
+        // Load the user's preferred temperature unit
         let unit = localStorage.getItem("unit") || "C";
         unitBtn.textContent = `°${unit}`;
 
+        // Toggle between Celsius and Fahrenheit
         unitBtn?.addEventListener("click", () => {
             unit = unit === "C" ? "F" : "C";
+
+            // Save preference
             localStorage.setItem("unit", unit);
+
+            // Update button label
             if (unitBtn) {
                 unitBtn.textContent = `°${unit}`;
             }
 
+            // Future enhancement:
             // applyUnit();
 
             showToast(`Temperature changed to °${unit}`);
         });
 
-        // Theme
+        /* ===========================
+           Theme Preference
+        =========================== */
+
+        // Load the user's preferred theme
         let theme = localStorage.getItem("theme") || "Dark";
         themeBtn.textContent = theme;
 
+        // Apply the saved theme immediately
         applyTheme();
 
+        // Toggle between Dark and Light themes
         themeBtn?.addEventListener("click", () => {
             theme = theme === "Dark" ? "Light" : "Dark";
 
+            // Save preference
             localStorage.setItem("theme", theme);
 
+            // Update button label
             if (themeBtn) {
                 themeBtn.textContent = theme;
             }
+
+            // Apply the selected theme
             applyTheme();
 
             showToast(`${theme} mode enabled`);
         });
 
+        /**
+         * Apply the currently selected theme
+         */
         function applyTheme() {
             document.documentElement.classList.toggle(
                 "light-theme",
@@ -150,23 +177,38 @@
             );
         }
 
-        // Animations
+        /* ===========================
+           Weather Animations
+        =========================== */
+
+        // Load the user's animation preference
         let animations = localStorage.getItem("animations") || "On";
         animationBtn.textContent = animations;
 
+        // Apply saved animation settings
         applyAnimations();
 
+        // Toggle weather animations
         animationBtn?.addEventListener("click", () => {
             animations = animations === "On" ? "Off" : "On";
+
+            // Save preference
             localStorage.setItem("animations", animations);
+
+            // Update button label
             if (animationBtn) {
                 animationBtn.textContent = animations;
             }
+
+            // Apply animation settings
             applyAnimations();
 
             showToast(`Animations ${animations}`);
         });
 
+        /**
+         * Show or hide background animations
+         */
         function applyAnimations() {
             const shootingStars = document.querySelectorAll(".shooting-star");
             const asteroids = document.querySelectorAll(".asteroid");
@@ -180,11 +222,18 @@
             }
         }
 
+        /* ===========================
+           Toast Notification
+        =========================== */
+
+        /**
+         * Display a temporary notification message
+         * @param {string} message - Text displayed inside the toast
+         */
         function showToast(message) {
             const toast = document.getElementById("toast");
 
             toast.textContent = message;
-
             toast.classList.add("show");
 
             setTimeout(() => {

@@ -120,9 +120,9 @@
 
                                 <form action="/favorite" method="POST">
 
-                                    <input type="hidden" name="city" value="<%= content.name %>" />
+                                    <input type="hidden" name="lat" value="<%= content.coord.lat %>" />
 
-                                    <input type="hidden" name="country" value="<%= content.sys.country %>" />
+                                    <input type="hidden" name="lon" value="<%= content.coord.lon %>" />
 
                                     <button class="favorite-btn">
                                         ⭐
@@ -339,13 +339,28 @@
     <div id="toast"></div>
 
     <script>
+        /* ===========================
+           Weather Data from the Server
+        =========================== */
+
+        // Retrieve the last searched location from the server
         const lastCity = "<%= typeof lastCity !== 'undefined' ? lastCity : '' %>";
         const lastCountry = "<%= typeof lastCountry !== 'undefined' ? lastCountry : '' %>";
+
+        const lastLat = "<%= typeof lat !== 'undefined' ? lat : '' %>";
+        const lastLon = "<%= typeof lon !== 'undefined' ? lon : '' %>";
+
+        // Retrieve the current weather condition
         const weatherMain =
             "<%= content && content.weather ? content.weather[0].main : '' %>";
     </script>
 
     <script>
+        /* ===========================
+           Persist Last Search
+        =========================== */
+
+        // Save the last successful search so it can be restored later
         if (lastCity && lastCountry) {
 
             localStorage.setItem("lastCity", lastCity);
@@ -353,10 +368,26 @@
 
         }
 
+        if (lastLat && lastLon) {
+
+            localStorage.setItem("lastLat", lastLat);
+            localStorage.setItem("lastLon", lastLon);
+
+        }
+
         const locationBtn = document.getElementById("locationBtn");
 
+        /* ===========================
+           Browser Geolocation
+        =========================== */
+
+        /**
+         * Request the user's current location
+         * and load weather using latitude and longitude.
+         */
         function getLocation() {
 
+            // Check whether Geolocation is supported
             if (!navigator.geolocation) {
                 alert("Geolocation is not supported by your browser.");
                 return;
@@ -364,6 +395,7 @@
 
             navigator.geolocation.getCurrentPosition(
 
+                // Location successfully retrieved
                 (position) => {
 
                     localStorage.setItem("locationPermission", "allowed");
@@ -371,11 +403,13 @@
                     const latitude = position.coords.latitude;
                     const longitude = position.coords.longitude;
 
+                    // Redirect to the backend route
                     window.location.href =
                         `/current-location?lat=${latitude}&lon=${longitude}`;
 
                 },
 
+                // User denied permission
                 () => {
 
                     localStorage.setItem("locationPermission", "denied");
@@ -386,17 +420,23 @@
 
         }
 
-        // Button still works
+        // Load weather using the location button
         locationBtn.addEventListener("click", getLocation);
 
-        // Automatically get location only if no weather is already displayed
+        /* ===========================
+           Auto Load Weather
+        =========================== */
+
+        // Automatically load weather when the page opens
         window.onload = function () {
 
             const weatherCard = document.querySelector(".weather-card");
             const errorCard = document.querySelector(".error-card");
 
+            // Skip auto-loading if weather is already displayed
             if (weatherCard || errorCard) return;
 
+            // Restore the last searched location
             const lastCity = localStorage.getItem("lastCity");
             const lastCountry = localStorage.getItem("lastCountry");
 
@@ -409,15 +449,22 @@
 
             }
 
+            // Do not ask again if permission was previously denied
             const permission =
                 localStorage.getItem("locationPermission");
 
             if (permission === "denied") return;
 
+            // Request the user's location
             getLocation();
 
         };
 
+        /* ===========================
+           Loading Screen
+        =========================== */
+
+        // Display the loading spinner while searching
         const weatherForm = document.querySelector(".weather-form");
 
         if (weatherForm) {
@@ -426,6 +473,14 @@
             });
         }
 
+        /* ===========================
+           Weather Effects
+        =========================== */
+
+        /**
+         * Display background effects based on
+         * the current weather condition.
+         */
         function applyWeatherEffects() {
 
             switch (weatherMain) {
@@ -451,12 +506,16 @@
 
         }
 
+        // Only display effects if animations are enabled
         const animationsEnabled = localStorage.getItem("animations") !== "Off";
 
         if (animationsEnabled) {
             applyWeatherEffects();
         }
 
+        /**
+         * Create animated rainfall.
+         */
         function createRain() {
 
             const container =
@@ -482,6 +541,9 @@
 
         }
 
+        /**
+         * Create the animated sun and rotating rays.
+         */
         function createSunRays() {
 
             const container = document.getElementById("weather-effects");
@@ -497,6 +559,9 @@
 
         }
 
+        /**
+         * Create animated snowfall.
+         */
         function createSnow() {
 
             const container =
@@ -525,6 +590,9 @@
 
         }
 
+        /**
+         * Create a lightning flash effect.
+         */
         function createThunder() {
 
             const container =
@@ -538,16 +606,23 @@
 
         }
 
+        /* ===========================
+           Dashboard Navigation
+        =========================== */
+
+        // Return to the most recently viewed location
         const dashboardLink = document.getElementById("dashboardLink");
 
         dashboardLink?.addEventListener("click", (e) => {
             e.preventDefault();
 
-            const city = localStorage.getItem("lastCity");
-            const country = localStorage.getItem("lastCountry");
+            // Retrieve the last searched location from local storage
+            const lat = localStorage.getItem("lastLat");
+            const lon = localStorage.getItem("lastLon");
 
-            if (city && country) {
-                window.location.href = `/favorite-weather?city=${city}&country=${country}`;
+            // If a previous search exists, reload it; otherwise return to the home page
+            if (lat && lon) {
+                window.location.href = `/favorite-weather?lat=${lat}&lon=${lon}`;
             } else {
                 window.location.href = "/";
             }
@@ -556,19 +631,41 @@
     </script>
 
     <script>
+
+        /* ===========================
+           Temperature Preference
+        =========================== */
+
+        // Convert displayed temperatures if Fahrenheit is selected
         document.addEventListener("DOMContentLoaded", () => {
+
             const unit = localStorage.getItem("unit") || "C";
 
             if (unit === "F") {
+
                 document.querySelectorAll(".temp").forEach(el => {
+
                     const c = Number(el.dataset.c);
+
                     const f = (c * 9 / 5 + 32).toFixed(0);
+
                     el.textContent = `${f}°F`;
+
                 });
+
             }
+
         });
 
+        /* ===========================
+           Toast Notification
+        =========================== */
+
+        /**
+         * Display a temporary notification.
+         */
         function showToast(message) {
+
             const toast = document.getElementById("toast");
 
             toast.textContent = message;
@@ -578,13 +675,20 @@
             setTimeout(() => {
                 toast.classList.remove("show");
             }, 2500);
+
         }
 
+        /* ===========================
+           URL Notifications
+        =========================== */
+
+        // Show a success notification after adding a favorite
         const params = new URLSearchParams(window.location.search);
 
         if (params.get("toast") === "added") {
             showToast("⭐ Added to Favorites");
         }
+
     </script>
 
 

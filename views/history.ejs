@@ -90,30 +90,42 @@
     <div id="toast"></div>
 
     <script>
+        /* ===========================
+           Dashboard Navigation
+        =========================== */
+
+        // Return to the most recently viewed weather dashboard
         const dashboardLink = document.getElementById("dashboardLink");
 
         dashboardLink?.addEventListener("click", (e) => {
             e.preventDefault();
 
-            const city = localStorage.getItem("lastCity");
-            const country = localStorage.getItem("lastCountry");
+            // Retrieve the last searched location from local storage
+            const lat = localStorage.getItem("lastLat");
+            const lon = localStorage.getItem("lastLon");
 
-            if (city && country) {
-                window.location.href = `/favorite-weather?city=${city}&country=${country}`;
+            // If a previous search exists, reload it; otherwise return to the home page
+            if (lat && lon) {
+                window.location.href = `/favorite-weather?lat=${lat}&lon=${lon}`;
             } else {
                 window.location.href = "/";
             }
         });
     </script>
 
-
-
     <script>
+        /* ===========================
+           Toast Notification
+        =========================== */
+
+        /**
+         * Display a temporary notification.
+         * @param {string} message - Message shown inside the toast.
+         */
         function showToast(message) {
             const toast = document.getElementById("toast");
 
             toast.textContent = message;
-
             toast.classList.add("show");
 
             setTimeout(() => {
@@ -121,7 +133,11 @@
             }, 2500);
         }
 
+        /* ===========================
+           URL Notifications
+        =========================== */
 
+        // Display a confirmation after clearing search history
         const params = new URLSearchParams(window.location.search);
 
         if (params.get("toast") === "cleared") {
